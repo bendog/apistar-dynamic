@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+apistar = "==0.5.42"
+apistar-jwt = "==0.4.2"
+"psycopg2" = "*"
+bcrypt = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
