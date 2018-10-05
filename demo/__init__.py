@@ -3,7 +3,7 @@ import logging
 from demo import apistar_config
 from demo.apistar_config import ApistarApp
 from demo.database import DbWrapper
-from dynamic_api import ApistarDynamic
+from apistar_dynamic import ApistarDynamic
 
 log = logging.getLogger(__name__)
 

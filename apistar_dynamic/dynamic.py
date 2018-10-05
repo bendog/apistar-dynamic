@@ -2,7 +2,6 @@ import logging
 # noinspection PyUnresolvedReferences
 import types as python_types
 import urllib.parse as urlparse
-from functools import lru_cache
 from typing import Optional
 
 from apistar import Route, http, types, validators
@@ -53,7 +52,7 @@ def create_fields(field_meta_data: list):
 
 # @lru_cache(maxsize=32, typed=True)  # add caching to reduce the hits to the database  # todo: create lru cache invalidator
 # def user_permitted(user_id: int=None, permission_id: int=None, database=None):
-def user_permitted(caller, user_id: int=None, permission_id: int=None, database=None):
+def user_permitted(user_id: int=None, permission_id: int=None, database=None):
     query1 = "select is_permitted(%(permissionid)s, %(userid)s) as permitted"
     database.cursor.execute(query1, {'permissionid': permission_id, 'userid': user_id})
     permitted = database.cursor.fetchone()[0]
@@ -74,7 +73,6 @@ class GetResponse(types.Type):
 class ApistarDynamic(object):
     api_metadata = []
     get_response_class = GetResponse
-    authentication_function = user_permitted
     database_class = None
     readonly_database_class = None
 
@@ -101,6 +99,9 @@ class ApistarDynamic(object):
     # META VIEWS - these scripts generate classes and functions to run the views.
     #
 
+    def authentication_function(self, user_id: int, permission_id: int):
+        user_permitted(user_id=user_id, permission_id=permission_id, database=self.readonly_database)
+
     def define_post_handler(self, api_metadata):
         """ build a handler to handle post requests to insert data """
         name = api_metadata['name']
@@ -119,7 +120,7 @@ class ApistarDynamic(object):
             payload.pop('id')  # remove id field
             database = database_class()
             # validate user
-            authentication_function(user_id=user.id, permission_id=permission_id, database=database)
+            authentication_function(user_id=user.id, permission_id=permission_id)
             # log.info(self.authentication_function.cache_info())
 
             for query in sql_list:
@@ -193,7 +194,7 @@ class ApistarDynamic(object):
             params = {**dict(query_params), **dict(path_params)}  # build params out of path and query params
 
             # validate user
-            authentication_function(user_id=user.id, permission_id=permission_id, database=db)
+            authentication_function(user_id=user.id, permission_id=permission_id)
             # log.info(user_permitted.cache_info())
 
             # PROCESS PAGINATION
