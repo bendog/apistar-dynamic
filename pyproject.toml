@@ -1,0 +1,9 @@
+[project]
+name = "apistar-dynamic"
+version = "0.1.1"
+description = "API Star Dynamic API Generator"
+readme = "README.md"
+requires-python = "==3.6"
+dependencies = [
+
+]
